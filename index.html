@@ -43,7 +43,7 @@
             color: var(--primary);
         }
 
-        /* Middle Result Area */
+/* Middle Result Area */
         #result-area {
             flex-grow: 1;
             padding: 20px;
@@ -54,20 +54,39 @@
             justify-content: center;
         }
 
-.card {
+        .card {
             background: #fff;
-            padding: 20px;
+            padding: 30px; /* INCREASED: was 20px. Makes the inside roomier */
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             width: 100%;
-            max-width: 400px;
-            display: none; /* Hidden by default */
+            max-width: 500px; /* INCREASED: was 400px. Makes the card wider */
+            display: none; 
         }
 
-        .card h2 { margin-top: 0; font-size: 1.2rem; color: #555; }
-        .card .product-name { font-size: 1.5rem; font-weight: bold; margin-bottom: 15px; }
-        .card .data-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1rem;}
-        .card .stock-balance { font-weight: bold; color: var(--primary); font-size: 1.3rem;}
+        /* INCREASED FONT SIZES BELOW */
+        .card h2 { 
+            margin-top: 0; 
+            font-size: 1.5rem; /* was 1.2rem */
+            color: #555; 
+        }
+        .card .product-name { 
+            font-size: 2rem; /* was 1.5rem */
+            font-weight: bold; 
+            margin-bottom: 20px; 
+            line-height: 1.2; /* Helps keep large text readable if it wraps to two lines */
+        }
+        .card .data-row { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 15px; 
+            font-size: 1.4rem; /* was 1.1rem */
+        }
+        .card .stock-balance { 
+            font-weight: bold; 
+            color: var(--primary); 
+            font-size: 1.8rem; /* was 1.3rem */
+        }
         
         #message {
             color: var(--secondary);
