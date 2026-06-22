@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Stock Checker</title>
+    <style>
+        :root {
+            --bg-color: #f4f4f9;
+            --text-color: #333;
+            --primary: #007bff;
+            --danger: #dc3545;
+            --secondary: #6c757d;
+            --key-bg: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden; /* Prevents whole-page scrolling */
+        }
+
+        /* Top Search Display */
+        #search-header {
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            z-index: 10;
+        }
+
+        #search-display {
+            font-size: 2rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            min-height: 40px;
+            color: var(--primary);
+        }
+
+        /* Middle Result Area */
+        #result-area {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 400px;
+            display: none; /* Hidden by default */
+        }
+
+        .card h2 { margin-top: 0; font-size: 1.2rem; color: #555; }
+        .card .product-name { font-size: 1.5rem; font-weight: bold; margin-bottom: 15px; }
+        .card .data-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1rem;}
+        .card .stock-balance { font-weight: bold; color: var(--primary); font-size: 1.3rem;}
+        
+        #message {
+            color: var(--secondary);
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        /* Bottom Keypad */
+        #keypad-container {
+            background: #e9ecef;
+            padding: 15px;
+            padding-bottom: max(15px, env(safe-area-inset-bottom)); /* For iPhones */
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        button {
+            background: var(--key-bg);
+            border: none;
+            border-radius: 8px;
+            padding: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+            touch-action: manipulation; /* Faster tap response on mobile */
+            transition: background 0.1s;
+        }
+
+        button:active { background: #d0d0d0; }
+        
+        .btn-action { background: var(--secondary); color: white; font-size: 1.2rem; }
+        .btn-search { background: var(--primary); color: white; }
+        .btn-delete { background: var(--danger); color: white; }
+        .btn-home { grid-column: span 3; background: #343a40; color: white; }
+
+    </style>
+</head>
+<body>
+
+    <div id="search-header">
+        <div id="search-display"></div>
+    </div>
+
+    <div id="result-area">
+        <div id="message">Enter a code to search...</div>
+        <div id="product-card" class="card">
+            <h2>Product Details</h2>
+            <div class="product-name" id="res-name"></div>
+            <div class="data-row">
+                <span>Stock Balance:</span>
+                <span class="stock-balance" id="res-balance"></span>
+            </div>
+            <div class="data-row">
+                <span>Last Updated:</span>
+                <span id="res-updated"></span>
+            </div>
+        </div>
+    </div>
+
+    <div id="keypad-container">
+        <div class="keypad">
+            <button onclick="pressKey('7')">7</button>
+            <button onclick="pressKey('8')">8</button>
+            <button onclick="pressKey('9')">9</button>
+            
+            <button onclick="pressKey('4')">4</button>
+            <button onclick="pressKey('5')">5</button>
+            <button onclick="pressKey('6')">6</button>
+            
+            <button onclick="pressKey('1')">1</button>
+            <button onclick="pressKey('2')">2</button>
+            <button onclick="pressKey('3')">3</button>
+            
+            <button class="btn-delete btn-action" onclick="deleteKey()">DEL</button>
+            <button onclick="pressKey('0')">0</button>
+            <button class="btn-search btn-action" onclick="searchStock()">Search</button>
+
+            <button class="btn-home btn-action" onclick="goHome()">Back / Home</button>
+        </div>
+    </div>
+
+    <script>
+        let currentInput = "";
+        let stockData = {}; // Object to store parsed CSV data
+
+        // DOM Elements
+        const displayEl = document.getElementById('search-display');
+        const messageEl = document.getElementById('message');
+        const cardEl = document.getElementById('product-card');
+        const resName = document.getElementById('res-name');
+        const resBalance = document.getElementById('res-balance');
+        const resUpdated = document.getElementById('res-updated');
+
+        // On load, fetch the CSV
+        window.onload = async function() {
+            try {
+                // Adjust path if your CSV is in a subfolder
+                const response = await fetch('stock.csv');
+                if (!response.ok) throw new Error('File not found');
+                const csvText = await response.text();
+                parseCSV(csvText);
+            } catch (error) {
+                console.error("Error loading CSV:", error);
+                messageEl.innerText = "Error loading stock.csv. Ensure it is in the repository root.";
+            }
+        };
+
+        // Parse CSV into a dictionary for instant lookups
+        function parseCSV(text) {
+            const lines = text.replace(/\r/g, '').split('\n');
+            
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i];
+                if (!line.trim()) continue; // Skip empty lines
+
+                const columns = line.split(';');
+                if (columns.length >= 4) {
+                    const code = columns[0].trim();
+                    stockData[code] = {
+                        name: columns[1].trim(),
+                        balance: columns[2].trim(),
+                        updated: columns[3].trim()
+                    };
+                }
+            }
+            console.log(`Loaded ${Object.keys(stockData).length} items.`);
+        }
+
+        // Keypad Interactions
+        function pressKey(num) {
+            currentInput += num;
+            updateDisplay();
+        }
+
+        function deleteKey() {
+            currentInput = currentInput.slice(0, -1);
+            updateDisplay();
+        }
+
+        function goHome() {
+            currentInput = "";
+            updateDisplay();
+            cardEl.style.display = 'none';
+            messageEl.style.display = 'block';
+            messageEl.innerText = "Enter a code to search...";
+        }
+
+        function updateDisplay() {
+            displayEl.innerText = currentInput;
+        }
+
+        // Search Logic
+        function searchStock() {
+            if (!currentInput) return;
+
+            const item = stockData[currentInput];
+
+            if (item) {
+                resName.innerText = item.name;
+                resBalance.innerText = item.balance;
+                resUpdated.innerText = item.updated;
+                
+                if(parseInt(item.balance) === 0) {
+                    resBalance.style.color = 'var(--danger)';
+                } else {
+                    resBalance.style.color = '#28a745'; // Green
+                }
+
+                messageEl.style.display = 'none';
+                cardEl.style.display = 'block';
+            } else {
+                cardEl.style.display = 'none';
+                messageEl.style.display = 'block';
+                messageEl.innerText = `Code ${currentInput} not found.`;
+            }
+        }
+    </script>
+</body>
+</html>
