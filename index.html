@@ -61,7 +61,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             width: 100%;
             max-width: 400px;
-            display: none; /* Hidden by default */
+            display: none;
         }
 
         .card h2 { margin-top: 0; font-size: 1.2rem; color: #555; }
@@ -100,7 +100,7 @@
             color: var(--text-color);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             cursor: pointer;
-            touch-action: manipulation; /* Faster tap response on mobile */
+            touch-action: manipulation;
             transition: background 0.1s;
         }
 
@@ -120,16 +120,15 @@
     </div>
 
     <div id="result-area">
-        <div id="message">Enter a code to search...</div>
+        <div id="message">Введите код...</div>
         <div id="product-card" class="card">
-            <h2>Product Details</h2>
             <div class="product-name" id="res-name"></div>
             <div class="data-row">
-                <span>Stock Balance:</span>
+                <span>Остаток:</span>
                 <span class="stock-balance" id="res-balance"></span>
             </div>
             <div class="data-row">
-                <span>Last Updated:</span>
+                <span>Обновлено:</span>
                 <span id="res-updated"></span>
             </div>
         </div>
@@ -151,15 +150,15 @@
             
             <button class="btn-delete btn-action" onclick="deleteKey()">DEL</button>
             <button onclick="pressKey('0')">0</button>
-            <button class="btn-search btn-action" onclick="searchStock()">Search</button>
+            <button class="btn-search btn-action" onclick="searchStock()">Поиск</button>
 
-            <button class="btn-home btn-action" onclick="goHome()">Back / Home</button>
+            <button class="btn-home btn-action" onclick="goHome()">Назад</button>
         </div>
     </div>
 
     <script>
         let currentInput = "";
-        let stockData = {}; // Object to store parsed CSV data
+        let stockData = {};
 
         // DOM Elements
         const displayEl = document.getElementById('search-display');
@@ -174,22 +173,21 @@
             try {
                 // Adjust path if your CSV is in a subfolder
                 const response = await fetch('stock.csv');
-                if (!response.ok) throw new Error('File not found');
+                if (!response.ok) throw new Error('Файл не найден');
                 const csvText = await response.text();
                 parseCSV(csvText);
             } catch (error) {
                 console.error("Error loading CSV:", error);
-                messageEl.innerText = "Error loading stock.csv. Ensure it is in the repository root.";
+                messageEl.innerText = "Ошибка";
             }
         };
 
-        // Parse CSV into a dictionary for instant lookups
         function parseCSV(text) {
             const lines = text.replace(/\r/g, '').split('\n');
             
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i];
-                if (!line.trim()) continue; // Skip empty lines
+                if (!line.trim()) continue;
 
                 const columns = line.split(';');
                 if (columns.length >= 4) {
@@ -220,14 +218,13 @@
             updateDisplay();
             cardEl.style.display = 'none';
             messageEl.style.display = 'block';
-            messageEl.innerText = "Enter a code to search...";
+            messageEl.innerText = "Введите код...";
         }
 
         function updateDisplay() {
             displayEl.innerText = currentInput;
         }
 
-        // Search Logic
         function searchStock() {
             if (!currentInput) return;
 
@@ -241,7 +238,7 @@
                 if(parseInt(item.balance) === 0) {
                     resBalance.style.color = 'var(--danger)';
                 } else {
-                    resBalance.style.color = '#28a745'; // Green
+                    resBalance.style.color = '#28a745';
                 }
 
                 messageEl.style.display = 'none';
@@ -249,7 +246,7 @@
             } else {
                 cardEl.style.display = 'none';
                 messageEl.style.display = 'block';
-                messageEl.innerText = `Code ${currentInput} not found.`;
+                messageEl.innerText = `Код ${currentInput} не существует`;
             }
         }
     </script>
