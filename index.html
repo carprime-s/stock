@@ -169,27 +169,48 @@
         const resUpdated = document.getElementById('res-updated');
 
         // On load, fetch the CSV
+// On load, fetch the CSV from Google Sheets
         window.onload = async function() {
             try {
-                // Adjust path if your CSV is in a subfolder
-                const response = await fetch('stock.csv');
-                if (!response.ok) throw new Error('Файл не найден');
+                // REPLACE THIS URL WITH YOUR ACTUAL SHEET ID
+                const url = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID_HERE/gviz/tq?tqx=out:csv&sheet=Sheet1";
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Network response was not ok');
                 const csvText = await response.text();
                 parseCSV(csvText);
             } catch (error) {
                 console.error("Error loading CSV:", error);
-                messageEl.innerText = "Ошибка";
+                messageEl.innerText = "Error loading data. Check your Sheet ID and sharing settings.";
             }
         };
 
+        // Helper function to handle Google's commas and quotation marks safely
+        function parseCSVRow(str) {
+            let arr = [];
+            let quote = false;
+            let col = '';
+            for (let i = 0; i < str.length; i++) {
+                let cc = str[i], nc = str[i+1];
+                if (cc === '"' && quote && nc === '"') { col += cc; ++i; continue; }
+                if (cc === '"') { quote = !quote; continue; }
+                if (cc === ',' && !quote) { arr.push(col); col = ''; continue; }
+                col += cc;
+            }
+            arr.push(col);
+            return arr;
+        }
+
+        // Parse CSV into a dictionary for instant lookups
         function parseCSV(text) {
             const lines = text.replace(/\r/g, '').split('\n');
             
+            // Skip the header (index 0)
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i];
-                if (!line.trim()) continue;
+                if (!line.trim()) continue; // Skip empty lines
 
-                const columns = line.split(';');
+                const columns = parseCSVRow(line);
                 if (columns.length >= 4) {
                     const code = columns[0].trim();
                     stockData[code] = {
