@@ -54,24 +54,24 @@
             justify-content: center;
         }
 
-        .card {
+.card {
             background: #fff;
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             width: 100%;
             max-width: 400px;
-            display: none;
+            display: none; /* Hidden by default */
         }
 
-        .card h2 { margin-top: 0; font-size: 1.8rem; color: #555; }
-        .card .product-name { font-size: 2.5rem; font-weight: bold; margin-bottom: 15px; }
-        .card .data-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.5rem;}
-        .card .stock-balance { font-weight: bold; color: var(--primary); font-size: 1.5rem;}
+        .card h2 { margin-top: 0; font-size: 1.2rem; color: #555; }
+        .card .product-name { font-size: 1.5rem; font-weight: bold; margin-bottom: 15px; }
+        .card .data-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1rem;}
+        .card .stock-balance { font-weight: bold; color: var(--primary); font-size: 1.3rem;}
         
         #message {
             color: var(--secondary);
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             text-align: center;
         }
 
@@ -79,7 +79,7 @@
         #keypad-container {
             background: #e9ecef;
             padding: 15px;
-            padding-bottom: max(15px, env(safe-area-inset-bottom));
+            padding-bottom: max(25px, env(safe-area-inset-bottom));
         }
 
         .keypad {
