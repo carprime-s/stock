@@ -94,18 +94,18 @@
             text-align: center;
         }
 
-        /* Bottom Keypad */
+/* Bottom Keypad */
         #keypad-container {
             background: #e9ecef;
-            padding: 25px;
-            padding-bottom: max(25px, env(safe-area-inset-bottom));
+            padding: 15px;
+            padding-bottom: max(20px, env(safe-area-inset-bottom)); /* For iPhones */
         }
 
         .keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
-            max-width: 200px;
+            max-width: 400px;
             margin: 0 auto;
         }
 
@@ -119,7 +119,7 @@
             color: var(--text-color);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             cursor: pointer;
-            touch-action: manipulation;
+            touch-action: manipulation; /* Faster tap response on mobile */
             transition: background 0.1s;
         }
 
