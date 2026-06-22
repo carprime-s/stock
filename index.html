@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stock Checker</title>
+    <title>Остатки на складе</title>
     <style>
         :root {
             --bg-color: #f4f4f9;
@@ -15,7 +15,6 @@
         }
 
         html {
-            /* Required fallback for older iOS Safari */
             height: -webkit-fill-available;
         }
 
@@ -29,11 +28,11 @@
             flex-direction: column;
             
             /* THE FIX IS HERE */
-            height: 100vh; /* Fallback for older screens */
-            height: 100dvh; /* Dynamic Viewport Height: respects mobile browser UI */
-            min-height: -webkit-fill-available; /* Fallback for iOS */
+            height: 100vh;
+            height: 100dvh;
+            min-height: -webkit-fill-available;
             
-            overflow: hidden; /* Prevents whole-page scrolling */
+            overflow: hidden;
         }
 
         /* Top Search Display */
@@ -107,15 +106,15 @@
 /* Bottom Keypad */
         #keypad-container {
             background: #e9ecef;
-            padding: 15px;
-            padding-bottom: max(20px, env(safe-area-inset-bottom));
-            flex-shrink: 0;
+            padding: 12px 15px; 
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
+            flex-shrink: 0; 
         }
 
         .keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 8px;
             max-width: 400px;
             margin: 0 auto;
         }
@@ -124,19 +123,19 @@
             background: var(--key-bg);
             border: none;
             border-radius: 8px;
-            padding: 20px;
-            font-size: 1.5rem;
+            padding: 12px; 
+            font-size: 1.4rem;
             font-weight: bold;
             color: var(--text-color);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             cursor: pointer;
-            touch-action: manipulation; /* Faster tap response on mobile */
+            touch-action: manipulation;
             transition: background 0.1s;
         }
 
         button:active { background: #d0d0d0; }
         
-        .btn-action { background: var(--secondary); color: white; font-size: 1.2rem; }
+        .btn-action { background: var(--secondary); color: white; font-size: 1.1rem; }
         .btn-search { background: var(--primary); color: white; }
         .btn-delete { background: var(--danger); color: white; }
         .btn-home { grid-column: span 3; background: #343a40; color: white; }
@@ -190,7 +189,6 @@
         let currentInput = "";
         let stockData = {};
 
-        // DOM Elements
         const displayEl = document.getElementById('search-display');
         const messageEl = document.getElementById('message');
         const cardEl = document.getElementById('product-card');
@@ -198,11 +196,8 @@
         const resBalance = document.getElementById('res-balance');
         const resUpdated = document.getElementById('res-updated');
 
-        // On load, fetch the CSV
-// On load, fetch the CSV from Google Sheets
         window.onload = async function() {
             try {
-                // REPLACE THIS URL WITH YOUR ACTUAL SHEET ID
                 const url = "https://docs.google.com/spreadsheets/d/1PGbOMLkyIpy4w-n_8StwpNhd8tfdYAlryb8u-_307qE/gviz/tq?tqx=out:csv&sheet=Sheet1";
                 
                 const response = await fetch(url);
@@ -210,12 +205,11 @@
                 const csvText = await response.text();
                 parseCSV(csvText);
             } catch (error) {
-                console.error("Error loading CSV:", error);
-                messageEl.innerText = "Error loading data. Check your Sheet ID and sharing settings.";
+                console.error("Ошибка загрузки CSV:", error);
+                messageEl.innerText = "Ошибка загрузки.";
             }
         };
 
-        // Helper function to handle Google's commas and quotation marks safely
         function parseCSVRow(str) {
             let arr = [];
             let quote = false;
@@ -231,7 +225,6 @@
             return arr;
         }
 
-        // Parse CSV into a dictionary for instant lookups
         function parseCSV(text) {
             const lines = text.replace(/\r/g, '').split('\n');
             
