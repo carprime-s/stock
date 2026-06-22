@@ -199,19 +199,34 @@
         const resBalance = document.getElementById('res-balance');
         const resUpdated = document.getElementById('res-updated');
 
-        window.onload = async function() {
+        async function loadStockData() {
             try {
                 const url = "https://docs.google.com/spreadsheets/d/1PGbOMLkyIpy4w-n_8StwpNhd8tfdYAlryb8u-_307qE/gviz/tq?tqx=out:csv&sheet=Sheet1";
                 
-                const response = await fetch(url);
+                const response = await fetch(url + "&_=" + new Date().getTime());
                 if (!response.ok) throw new Error('Network response was not ok');
+                
                 const csvText = await response.text();
                 parseCSV(csvText);
             } catch (error) {
-                console.error("Ошибка загрузки CSV:", error);
-                messageEl.innerText = "Ошибка загрузки.";
+                console.error("Ошибка загрузки.", error);
+                if (Object.keys(stockData).length === 0) {
+                    messageEl.innerText = "Ошибка загрузки данных. Попробуйте перезагрузить страницу.";
+                }
             }
-        };
+        }
+
+        window.onload = loadStockData;
+
+        // 3. Reload silently every time the user unlocks their phone or returns to the tab
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") {
+                console.log("Tab became visible: refreshing data...");
+                loadStockData();
+            }
+        });
+
+        setInterval(loadStockData, 300000);
 
         function parseCSVRow(str) {
             let arr = [];
